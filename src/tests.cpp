@@ -61,6 +61,7 @@ TEST(FusionEKF, calcQ1) {
 	for(int i = 0; i < 4; i++) {
 		ASSERT_EQ(res(i,0),res(0,i)) << res;
 	}
+	// Check it
 }
 
 void PrintTo(const VectorXd& bar, ::std::ostream* os) {
