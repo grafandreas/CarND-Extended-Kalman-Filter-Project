@@ -29,6 +29,8 @@ public:
   */
   MatrixXd CalculateJacobian(const VectorXd& x_state);
 
+  MatrixXd polar2Cart(const VectorXd& polarC);
+
 };
 
 #endif /* TOOLS_H_ */

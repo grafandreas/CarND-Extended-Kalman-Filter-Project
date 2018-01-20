@@ -9,6 +9,7 @@
 
 
 #include "kalman_filter.h"
+#include "tools.h"
 #include "FusionEKF.h"
 #include <gtest/gtest.h>
 #include <iostream>
@@ -46,8 +47,15 @@ TEST(KalmanTest, Predict) {
 }
 
 TEST(KalmanTest, Update) {
+   auto sut = setup();
+
+   sut->Predict();
+   sut->Update( Vector4d(1.0,1.0,1.0,1.0));
+
+
 
 }
+
 
 TEST(FusionEKF, calcQZ) {
 	auto sut = FusionEKF();
@@ -63,6 +71,66 @@ TEST(FusionEKF, calcQ1) {
 	}
 	// Check it
 }
+
+
+TEST(Tools, RMSE1) {
+	auto sut = Tools();
+	VectorXd t1(4);
+	t1 << 1.0,1.0,1.0,2.0;
+
+	std::vector<VectorXd> e;
+	std::vector<VectorXd> g;
+	e.push_back(t1);
+	g.push_back(t1);
+
+	VectorXd exp(4);
+	exp << 0.0,0.0,0.0,0.0;
+	auto res = sut.CalculateRMSE(e,g);
+	ASSERT_EQ(exp,res) << res;
+}
+
+TEST(Tools, RMSE2) {
+	auto sut = Tools();
+	VectorXd t1(4);
+	t1 << 1.0,1.0,1.0,2.0;
+
+	VectorXd t2(4);
+	t2 << 0.0,1.0,1.0,2.0;
+
+	std::vector<VectorXd> e;
+	std::vector<VectorXd> g;
+	e.push_back(t1);
+	g.push_back(t2);
+
+	VectorXd exp(4);
+	exp << 1.0,0.0,0.0,0.0;
+	auto res = sut.CalculateRMSE(e,g);
+	ASSERT_EQ(exp,res) << res;
+}
+
+TEST(Tools, polar2Cart) {
+	auto sut = Tools();
+	VectorXd t1 = VectorXd::Zero(3);
+	t1 << 1.0,0.0,0.0;
+
+	VectorXd exp(4);
+	exp << 1.0,0.0,0.0,0.0;
+	auto res = sut.polar2Cart(t1);
+	ASSERT_EQ(exp,res) << res;
+}
+
+TEST(Tools, polar2Cart_2) {
+	auto sut = Tools();
+	VectorXd t1 = VectorXd::Zero(3);
+	t1 << 1.0,M_PI,0.0;
+
+	VectorXd exp(4);
+	exp << -1.0,1.2246467991473532e-16,0.0,0.0;
+	auto res = sut.polar2Cart(t1);
+	ASSERT_DOUBLE_EQ(exp(0),res(0)) << res;
+	ASSERT_DOUBLE_EQ(exp(1),res(1)) << res;
+}
+
 
 void PrintTo(const VectorXd& bar, ::std::ostream* os) {
   *os << bar << std::endl;  // whatever needed to print bar to os

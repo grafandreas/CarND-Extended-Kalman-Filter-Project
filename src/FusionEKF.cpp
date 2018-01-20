@@ -31,11 +31,17 @@ FusionEKF::FusionEKF() {
         0, 0.0009, 0,
         0, 0, 0.09;
 
-  /**
-  TODO:
-    * Finish initializing the FusionEKF.
-    * Set the process and measurement noises
-  */
+  VectorXd x_(4);
+  	x_ << 0.0,0.0,1.0,1.0;
+  	MatrixXd F_ = MatrixXd::Identity(4,4);
+  	F_(0,2) =0.5;
+  	F_(1,3) = 0.5;
+
+  	MatrixXd P_ = MatrixXd::Zero(4,4);
+  	MatrixXd Q_ = MatrixXd::Zero(4,4);
+
+  	MatrixXd dummy_= MatrixXd::Constant(4,4,0.0) ;
+  	ekf_.Init(x_,P_,F_,dummy_,dummy_,Q_);
 
 
 }
@@ -64,14 +70,15 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     ekf_.x_ << 1, 1, 1, 1;
 
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-      /**
-      Convert radar from polar to cartesian coordinates and initialize state.
-      */
+      Tools t;
+      VectorXd c = t.polar2Cart(measurement_pack.raw_measurements_);
+      ekf_.x_ << c[0], c[1],c[2],c[3];
     }
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
-      /**
-      Initialize state.
-      */
+    	ekf_.x_ << measurement_pack.raw_measurements_[0],
+    			measurement_pack.raw_measurements_[1],
+				measurement_pack.raw_measurements_[2],
+				measurement_pack.raw_measurements_[3];
     }
 
     // done initializing, no need to predict or update
