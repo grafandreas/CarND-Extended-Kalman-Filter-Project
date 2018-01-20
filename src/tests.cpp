@@ -24,8 +24,8 @@ KalmanFilter * setup() {
 	F_(0,2) =0.5;
 	F_(1,3) = 0.5;
 
-	MatrixXd P_ = MatrixXd::Zero(0,0);
-	MatrixXd Q_ = MatrixXd::Zero(0,0);
+	MatrixXd P_ = MatrixXd::Zero(4,4);
+	MatrixXd Q_ = MatrixXd::Zero(4,4);
 
 	MatrixXd dummy_= MatrixXd::Constant(4,4,0.0) ;
 	sut->Init(x_,P_,F_,dummy_,dummy_,Q_);

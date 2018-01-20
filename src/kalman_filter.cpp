@@ -1,4 +1,6 @@
 #include "kalman_filter.h"
+#include <assert.h>
+#include <iostream>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -12,6 +14,13 @@ KalmanFilter::~KalmanFilter() {}
 
 void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
                         MatrixXd &H_in, MatrixXd &R_in, MatrixXd &Q_in) {
+
+
+  assert(P_in.rows() == F_in.rows());
+  assert(P_in.rows() == Q_in.rows());
+  assert(P_in.cols() == F_in.cols());
+  assert(P_in.cols() == Q_in.cols());
+
   x_ = x_in;
   P_ = P_in;
   F_ = F_in;
@@ -24,8 +33,8 @@ void KalmanFilter::Predict() {
   auto x_dash = F_* x_;
   x_ = x_dash;
 
-//  auto P_dash = F_* P_ * F_.transpose()+Q_;
-//  P_ = P_dash;
+  auto P_dash = F_* P_ * F_.transpose()+Q_;
+  P_ = P_dash;
 }
 
 void KalmanFilter::Update(const VectorXd &z) {
