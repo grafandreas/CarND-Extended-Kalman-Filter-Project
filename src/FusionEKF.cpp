@@ -104,7 +104,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    */
 
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-    // Radar updates
+    // Radar updates bla fasel d
   } else {
     // Laser updates
   }
@@ -112,4 +112,34 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   // print the output
   cout << "x_ = " << ekf_.x_ << endl;
   cout << "P_ = " << ekf_.P_ << endl;
+
+
+
+
 }
+
+MatrixXd FusionEKF::calcQ(const double dt){
+
+  const double dt2 = dt * dt;
+  const double dt3 = dt * dt2;
+  const double dt4 = dt * dt3;
+
+  const double r11 = dt4 * noise_ax / 4;
+  const double r13 = dt3 * noise_ax / 2;
+  const double r22 = dt4 * noise_ay / 4;
+  const double r24 = dt3 * noise_ay / 2;
+  const double r31 = dt3 * noise_ax / 2;
+  const double r33 = dt2 * noise_ax;
+  const double r42 = dt3 * noise_ay / 2;
+  const double r44 = dt2 * noise_ay;
+
+  MatrixXd Q = MatrixXd::Zero(4,4);
+
+  Q << r11, 0.0, r13, 0.0,
+             0.0, r22, 0.0, r24,
+             r31, 0.0, r33, 0.0,
+             0.0, r42, 0.0, r44;
+
+  return Q;
+}
+
