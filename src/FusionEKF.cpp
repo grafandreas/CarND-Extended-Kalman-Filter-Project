@@ -76,7 +76,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
       Tools t;
       VectorXd c = t.polar2Cart(measurement_pack.raw_measurements_);
-      ekf_.x_ << c[0], c[1], c[2], c[3];
+      ekf_.x_ << c[0], c[1], 0.0, 0.0;
     } else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
       ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack
           .raw_measurements_[1], 0,  // Should 2 and 3 should be 0 anyway, but use constant so
@@ -99,9 +99,9 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     return;
   }
 
-  if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-    return;
-  }
+//  if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
+//    return;
+//  }
 
   /*****************************************************************************
    *  Prediction
@@ -143,11 +143,11 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    */
   cout << "Meas: " << measurement_pack.raw_measurements_ << endl;
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-//    cout << "RADAR" << endl;
-//	  ekf_.H_ = tools.CalculateJacobian(ekf_.x_);
-//	  assert(!ekf_.H_.hasNaN());
-//	  	ekf_.R_ = R_radar_;
-//	  ekf_.UpdateEKF(measurement_pack.raw_measurements_);
+    cout << "RADAR" << endl;
+	  ekf_.H_ = tools.CalculateJacobian(ekf_.x_);
+	  assert(!ekf_.H_.hasNaN());
+	  	ekf_.R_ = R_radar_;
+	  ekf_.UpdateEKF(measurement_pack.raw_measurements_);
   } else {
     cout << "LASER" << endl;
     ekf_.H_ = H_laser_;

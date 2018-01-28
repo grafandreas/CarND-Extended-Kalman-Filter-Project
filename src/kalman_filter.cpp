@@ -37,6 +37,7 @@ void KalmanFilter::Predict() {
   VectorXd x_dash = F_* x_;
   MatrixXd P_dash = F_* P_ * (F_.transpose())+Q_;
 
+#ifdef DEBUG
   cout << "<table><tr><td>P_</td><td>P'</td><td>x_</td><td>x'</td><td>Q_</td><td>F_</td></tr>" <<endl;
        cout << "<tr><td>" << P_.format(tool.htmlFormat) << "</td>" << endl;
        cout << "<td>" << P_dash.format(tool.htmlFormat) << "</td>" << endl;
@@ -52,6 +53,7 @@ void KalmanFilter::Predict() {
   cout << "<td>" << (F_*P_* (F_.transpose())).format(tool.htmlFormat) << "</td>" << endl;
   cout << "<td>" << (F_* P_ * (F_.transpose())+Q_).format(tool.htmlFormat) << "</td>" << endl;
   cout << "</tr></table>" << endl;
+#endif
   x_ = x_dash;
   P_ = P_dash;
 
@@ -71,12 +73,20 @@ void KalmanFilter::Update(const VectorXd &z) {
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
   double rho = sqrt(x_(0)*x_(0) + x_(1)*x_(1));
-  double theta = atan(x_(1) / x_(0));
+  double theta = atan2(x_(1) , x_(0));
   double rho_dot = (x_(0)*x_(2) + x_(1)*x_(3)) / rho;
   VectorXd h = VectorXd(3);
   h << rho, theta, rho_dot;
 
   VectorXd y = z - h;
+
+
+  for(; y(1) < -M_PI; y(1) += 2*M_PI);
+  for(; y(1) > M_PI;  y(1) -= 2*M_PI);
+
+  cout << "y(1)" <<y(1) << endl;
+  assert(y(1) >= ( -1 * M_PI));
+  assert(y(1) <=  M_PI);
   updateCommon(y);
 }
 
@@ -96,6 +106,7 @@ void KalmanFilter::updateCommon(const VectorXd &y) {
 //		cout << "S " << S << endl;
 //		cout << "Si " << S.inverse() << endl;
   Tools tool;
+#ifdef DEBUG
   cout << "<table><tr><td>P_</td><td>H_</td><td>R_</td><td>K_</td><td>x_</td><td>x_dash</td><td>y</td><td>PH_t</td><td>Si</td><td>S</td></tr>" <<endl;
   cout << "<tr><td>" << P_.format(tool.htmlFormat) << "</td>" << endl;
   cout << "<td>" << H_.format(tool.htmlFormat) << "</td>" << endl;
@@ -115,6 +126,7 @@ void KalmanFilter::updateCommon(const VectorXd &y) {
   cout << "x_" << x_ << endl;
   cout << "K" << K << endl;
   cout << "y" << y << endl;
+#endif
 
   assert(!x_dash.hasNaN());
   x_ = x_dash;
