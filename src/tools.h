@@ -7,6 +7,8 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 using namespace std;
 
+#define FLOAT_FIX(x) ((fabs(x)) < 0.00001 ? 0.00001 : (x))
+
 class Tools {
 public:
   /**
@@ -19,6 +21,7 @@ public:
   */
   virtual ~Tools();
 
+  Eigen::IOFormat htmlFormat = Eigen::IOFormat(Eigen::FullPrecision,Eigen::DontAlignCols,"</td><td>","\n","<tr><td>","</td></tr>","<table border='1'>", "</table>");
   /**
   * A helper method to calculate RMSE.
   */

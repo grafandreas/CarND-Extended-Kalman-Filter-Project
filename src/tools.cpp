@@ -7,6 +7,9 @@ using Eigen::VectorXd;
 using Eigen::MatrixXd;
 using std::vector;
 
+#define EPS 0.0001 // A very small number
+#define EPS2 0.0000001
+
 Tools::Tools() {}
 
 Tools::~Tools() {}
@@ -31,10 +34,40 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 }
 
 MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
-  /**
-  TODO:
-    * Calculate a Jacobian here.
-  */
+  float px = x_state(0);
+  float py = x_state(1);
+  float vx = x_state(2);
+  float vy = x_state(3);
+  MatrixXd Hj(3, 4);
+  // Deal with the special case problems
+  px = FLOAT_FIX(px);
+  py = FLOAT_FIX(py);
+
+  // Pre-compute a set of terms to avoid repeated calculation
+  float c1 = px * px + py * py;
+  // Check division by zero
+
+  c1 = FLOAT_FIX(c1);
+  float c2 = sqrt(c1);
+//  c2 = FLOAT_FIX(c2);
+  float c3 = (c1 * c2);
+//  c3 = FLOAT_FIX(c3);
+
+  // Compute the Jacobian matrix
+  Hj << (px/c2), (py/c2), 0, 0,
+       -(py/c1), (px/c1), 0, 0,
+        py*(vx*py - vy*px)/c3, px*(px*vy - py*vx)/c3, px/c2, py/c2;
+
+  for (int i = 0; i < 4; i++)
+    for (int j = 0; j < 3; j++)
+      if (isnan(Hj.coeff(i, j))) {
+        cout << "Nan " << i << "," << j << endl;
+        cout << c1 << "," << c2 << "," << c3 << endl;
+      }
+
+  assert(!Hj.hasNaN());
+
+  return Hj;
 }
 
 MatrixXd Tools::polar2Cart(const VectorXd& polarC) {
