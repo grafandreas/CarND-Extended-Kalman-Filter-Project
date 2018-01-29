@@ -33,7 +33,7 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
 
 void KalmanFilter::Predict() {
   Tools tool;
-  cout << "<h3>Predict</h3>" << endl;
+//  cout << "<h3>Predict</h3>" << endl;
   VectorXd x_dash = F_* x_;
   MatrixXd P_dash = F_* P_ * (F_.transpose())+Q_;
 
@@ -65,7 +65,7 @@ void KalmanFilter::Predict() {
 
 void KalmanFilter::Update(const VectorXd &z) {
 
-  cout << "<h3>Update</h3>" << endl;
+//  cout << "<h3>Update</h3>" << endl;
 
 	VectorXd y = z - H_ * x_;
 	updateCommon(y);
@@ -102,7 +102,7 @@ void KalmanFilter::updateCommon(const VectorXd &y) {
   MatrixXd I = MatrixXd::Identity(P_.rows(), P_.cols());
   assert(!I.hasNaN());
   VectorXd x_dash = x_ + K * y;
-  cout << "DBG" << endl;
+//  cout << "DBG" << endl;
 //		cout << "S " << S << endl;
 //		cout << "Si " << S.inverse() << endl;
   Tools tool;

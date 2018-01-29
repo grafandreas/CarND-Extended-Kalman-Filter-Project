@@ -64,8 +64,8 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   for (int i = 0; i < 4; i++)
     for (int j = 0; j < 3; j++)
       if (isnan(Hj.coeff(i, j))) {
-        cout << "Nan " << i << "," << j << endl;
-        cout << c1 << "," << c2 << "," << c3 << endl;
+//        cout << "Nan " << i << "," << j << endl;
+//        cout << c1 << "," << c2 << "," << c3 << endl;
       }
 
   assert(!Hj.hasNaN());

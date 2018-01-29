@@ -69,7 +69,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
      * Remember: you'll need to convert radar from polar to cartesian coordinates.
      */
     // first measurement
-    cout << "EKF: " << endl;
+//    cout << "EKF: " << endl;
     ekf_.x_ = VectorXd(4);
     ekf_.x_ << 1, 1, 1, 1;
 
@@ -118,7 +118,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   auto delta_t = ((measurement_pack.timestamp_ - previous_timestamp_)
       / 1000000.0);
   previous_timestamp_ = measurement_pack.timestamp_;
-  std::cout << "delta_t" << delta_t << endl;
+//  std::cout << "delta_t" << delta_t << endl;
 
   ekf_.F_ = MatrixXd(4, 4);
   ekf_.F_ <<  1, 0, delta_t, 0,
@@ -141,15 +141,15 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    * Use the sensor type to perform the update step.
    * Update the state and covariance matrices.
    */
-  cout << "Meas: " << measurement_pack.raw_measurements_ << endl;
+//  cout << "Meas: " << measurement_pack.raw_measurements_ << endl;
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-    cout << "RADAR" << endl;
+//    cout << "RADAR" << endl;
 	  ekf_.H_ = tools.CalculateJacobian(ekf_.x_);
 	  assert(!ekf_.H_.hasNaN());
 	  	ekf_.R_ = R_radar_;
 	  ekf_.UpdateEKF(measurement_pack.raw_measurements_);
   } else {
-    cout << "LASER" << endl;
+//    cout << "LASER" << endl;
     ekf_.H_ = H_laser_;
     assert(!ekf_.H_.hasNaN());
     ekf_.R_ = R_laser_;
