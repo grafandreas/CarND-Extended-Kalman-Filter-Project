@@ -75,6 +75,9 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
       Tools t;
+
+      // polar2Cart calculates All, but we only use X/Y
+      //
       VectorXd c = t.polar2Cart(measurement_pack.raw_measurements_);
       ekf_.x_ << c[0], c[1], 0.0, 0.0;
     } else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
@@ -83,8 +86,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       0;
     }
 
-    // We need to init timestamp, too otherwise
-    // first real measurement will be really distorted
+    // The first time_stamp is being set
     //
     previous_timestamp_ = measurement_pack.timestamp_;
     ekf_.P_ = MatrixXd(4, 4);
@@ -107,16 +109,11 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    *  Prediction
    ****************************************************************************/
 
-  /**
-   TODO:
-   * Update the state transition matrix F according to the new elapsed time.
-   - Time is measured in seconds.
-   * Update the process noise covariance matrix.
-   * Use noise_ax = 9 and noise_ay = 9 for your Q matrix.
-   */
 
   auto delta_t = ((measurement_pack.timestamp_ - previous_timestamp_)
       / 1000000.0);
+
+  // Make sure that we calculate on the delta the next time.
   previous_timestamp_ = measurement_pack.timestamp_;
 //  std::cout << "delta_t" << delta_t << endl;
 
@@ -125,8 +122,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
               0, 1, 0, delta_t,
               0, 0, 1, 0,
               0, 0, 0, 1;
-   // Noise covariance matrix computation
-   // Noise values from the task
+
 
   ekf_.Q_ = calcQ(delta_t);
 
@@ -165,6 +161,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
 }
 
+// Directly taken from the lessons
+//
 MatrixXd FusionEKF::calcQ(const double delta_t){
 
   const double dt2 = delta_t * delta_t;
